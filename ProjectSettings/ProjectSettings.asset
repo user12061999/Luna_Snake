@@ -895,10 +895,10 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 2072dddc-acb0-4955-a6e7-17097769d248
+  cloudProjectId: 868a8927-18c8-4e85-b3cb-0c5027c1bdb6
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: My project 2025-11-17_15-10-14
+  projectName: Luna_Snake
   organizationId: user12061999
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
