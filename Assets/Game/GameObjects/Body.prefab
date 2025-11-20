@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5902524208557618565}
   - component: {fileID: 3709373179328251319}
   - component: {fileID: 7553892906549606581}
+  - component: {fileID: 1948191975701780385}
   m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
@@ -146,6 +147,37 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1948191975701780385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3710504636026387562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 915ef3935b3aec8428ba260f5aea41fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sprites:
+    straightHorizontal:
+      lightOnTop: {fileID: 21300000, guid: 7d05a785a2abdc54aa6e9ceb0af5e51e, type: 3}
+      darkOnTop: {fileID: 21300000, guid: 47df114bcd3c9d74fb1c74e0529055cc, type: 3}
+    straightVertical:
+      lightOnTop: {fileID: 21300000, guid: c004b087c2c3f284ab74c49e4a389c77, type: 3}
+      darkOnTop: {fileID: 21300000, guid: 8ac8b6f63fc6ce14f9d4c4c0edfb16dc, type: 3}
+    curveTR:
+      lightOnTop: {fileID: 21300000, guid: e9012c16be4c99b49859b3531301a2cc, type: 3}
+      darkOnTop: {fileID: 21300000, guid: adcffe1c60d37a34483a4617d730f93a, type: 3}
+    curveTL:
+      lightOnTop: {fileID: 21300000, guid: 5d9338a37ff054a4f9b4057609b933f9, type: 3}
+      darkOnTop: {fileID: 21300000, guid: c774d11a85035764aaf3ac818983adfc, type: 3}
+    curveBR:
+      lightOnTop: {fileID: 21300000, guid: df55bebe1392e3740b11aa85b01f81ad, type: 3}
+      darkOnTop: {fileID: 21300000, guid: 2725fa413d347ba488f6883d300141e0, type: 3}
+    curveBL:
+      lightOnTop: {fileID: 21300000, guid: a14b6f21f9dbfed4f9178fd6541d43b8, type: 3}
+      darkOnTop: {fileID: 21300000, guid: 5fda0cd3e5aac674f80123d38cbbc725, type: 3}
 --- !u!1 &5195900511257970683
 GameObject:
   m_ObjectHideFlags: 0

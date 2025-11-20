@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Spine;
+using Spine.Unity;
 using UnityEngine;
 
 public class SnakeController : MonoBehaviour
@@ -9,7 +11,6 @@ public class SnakeController : MonoBehaviour
     public Transform bodyPrefab;
     public Transform tailPrefab;
     public Transform segmentsParent;
-
     [Header("Move Settings")]
     public float stepDistance = 1f;
     public float moveDuration = 0.12f;
@@ -31,7 +32,6 @@ public class SnakeController : MonoBehaviour
     public AudioClip sfxEat;
     public AudioClip sfxDie;
     public AudioClip sfxGate;
-
     [Header("Audio - Music")]
     public AudioSource musicSource;
     public AudioClip musicClip;
@@ -51,87 +51,93 @@ public class SnakeController : MonoBehaviour
 
     private bool isFinishing = false; // đang trong animation chui vào cổng
 
+    private SnakeHeadAnimator headAnim; // Thêm biến này để dùng Spine anim
+
     void Start()
     {
         SpawnInitialSnake();
     }
+
     void Update()
     {
         // Test input từ keyboard
-        if (Input.GetKeyDown(KeyCode.W))
-            OnMoveUp();
-        else if (Input.GetKeyDown(KeyCode.S))
-            OnMoveDown();
-        else if (Input.GetKeyDown(KeyCode.A))
-            OnMoveLeft();
-        else if (Input.GetKeyDown(KeyCode.D))
-            OnMoveRight();
-    }
-    // =========================
-    // UI INPUT
-    // =========================
-    public void OnMoveUp()
-    {
-        TryStartMove(Vector2.up);
+        if (Input.GetKeyDown(KeyCode.W)) OnMoveUp();
+        else if (Input.GetKeyDown(KeyCode.S)) OnMoveDown();
+        else if (Input.GetKeyDown(KeyCode.A)) OnMoveLeft();
+        else if (Input.GetKeyDown(KeyCode.D)) OnMoveRight();
+
+        // Check nếu có Apple bên cạnh thì trigger idleToEat
+        CheckAppleAroundHead();
     }
 
-    public void OnMoveDown()
+    void CheckAppleAroundHead()
     {
-        TryStartMove(Vector2.down);
+        if (segments.Count == 0 || headAnim == null) return;
+
+        Vector3[] directions = new Vector3[]
+        {
+            Vector3.up,
+            Vector3.down,
+            Vector3.left,
+            Vector3.right
+        };
+
+        foreach (var dir in directions)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(segments[0].position, dir, stepDistance * 0.9f, appleMask);
+            if (hit.collider != null && hit.collider.CompareTag("Apple"))
+            {
+                headAnim.PlayIdleToEat();
+                return;
+            }
+        }
     }
 
-    public void OnMoveLeft()
-    {
-        TryStartMove(Vector2.left);
-    }
-
-    public void OnMoveRight()
-    {
-        TryStartMove(Vector2.right);
-    }
+    public void OnMoveUp() => TryStartMove(Vector2.up);
+    public void OnMoveDown() => TryStartMove(Vector2.down);
+    public void OnMoveLeft() => TryStartMove(Vector2.left);
+    public void OnMoveRight() => TryStartMove(Vector2.right);
 
     void TryStartMove(Vector2 dir)
     {
         if (isBusy || isDead || isWin || isFinishing) return;
         if (dir == Vector2.zero) return;
 
-        moveDir = dir.normalized;
 
+        moveDir = dir.normalized;
         StartMusicIfNeeded();
         StartCoroutine(PerformStepWithGravity());
     }
 
-    // =========================================================
-    // INIT
-    // =========================================================
     void SpawnInitialSnake()
     {
         segments.Clear();
 
+
         Vector3 pos = transform.position;
 
-        // Head
+
         Transform head = Instantiate(headPrefab, pos, Quaternion.identity, segmentsParent);
         segments.Add(head);
 
-        // Body
-        Transform body = Instantiate(
-            bodyPrefab,
-            pos - new Vector3(stepDistance, 0f, 0f),
-            Quaternion.identity,
-            segmentsParent);
+
+        headAnim = head.GetComponentInChildren<SnakeHeadAnimator>();
+        headAnim?.PlayIdle();
+
+
+        Transform body = Instantiate(bodyPrefab, pos - new Vector3(stepDistance, 0f, 0f), Quaternion.identity, segmentsParent);
         segments.Add(body);
 
-        // Tail
-        Transform tail = Instantiate(
-            tailPrefab,
-            pos - new Vector3(stepDistance * 2f, 0f, 0f),
-            Quaternion.identity,
-            segmentsParent);
+
+        Transform tail = Instantiate(tailPrefab, pos - new Vector3(stepDistance * 2f, 0f, 0f), Quaternion.identity, segmentsParent);
         segments.Add(tail);
+
 
         UpdateSegmentRotations();
     }
+
+    // giữ nguyên phần còn lại...
+
 
     // =========================================================
     // STEP + GRAVITY
@@ -159,22 +165,21 @@ public class SnakeController : MonoBehaviour
     IEnumerator MoveOneStepAnimated()
     {
         moveSucceeded = false;
-
         Vector3 dir3 = new Vector3(moveDir.x, moveDir.y, 0f);
-
-        // Block bởi tường + ground + chính cơ thể + spike (không đi xuyên ngang)
         LayerMask blockMask = wallMask | groundMask | segmentMask | spikeMask;
+
+
         if (Physics2D.Raycast(segments[0].position, dir3, stepDistance, blockMask))
         {
             PlaySFX(sfxCantMove);
+            headAnim?.PlayStuck();
             yield break;
         }
-            
 
-        // có thể di chuyển -> play SFX move
+
         PlaySFX(sfxMove);
 
-        // Check apple phía trước
+
         Collider2D appleToEat = null;
         RaycastHit2D[] hits = Physics2D.RaycastAll(segments[0].position, dir3, stepDistance);
         foreach (var hit in hits)
@@ -187,75 +192,72 @@ public class SnakeController : MonoBehaviour
         }
         bool willGrow = (appleToEat != null);
 
-        // --------- Lưu vị trí trước khi move ---------
+
         List<Vector3> startPos = GetPositions();
         int oldCount = startPos.Count;
-
-        // Target positions cho chuỗi cũ (chưa grow)
         List<Vector3> targetPos = new List<Vector3>(startPos);
-        targetPos[0] = startPos[0] + dir3 * stepDistance;  // head mới
-        for (int i = 1; i < oldCount; i++)
-            targetPos[i] = startPos[i - 1];                // mỗi đoạn tới vị trí của đoạn trước
 
-        // --------- Animate move ---------
+
+        targetPos[0] = startPos[0] + dir3 * stepDistance;
+        for (int i = 1; i < oldCount; i++)
+            targetPos[i] = startPos[i - 1];
+
+
         float t = 0f;
         while (t < moveDuration)
         {
             t += Time.deltaTime;
             float a = Mathf.Clamp01(t / moveDuration);
 
+
             for (int i = 0; i < segments.Count; i++)
                 segments[i].position = Vector3.Lerp(startPos[i], targetPos[i], a);
+
 
             UpdateSegmentRotations();
             yield return null;
         }
 
-        // snap
+
         for (int i = 0; i < segments.Count; i++)
             segments[i].position = targetPos[i];
 
-        // Sau khi di chuyển, check Spike / Gate
+
         if (CheckSpikeHit() || CheckFinish())
         {
             moveSucceeded = false;
             yield break;
         }
 
-        // --------- Nếu không có apple -> xong ---------
+
         if (!willGrow)
         {
             moveSucceeded = true;
             UpdateSegmentRotations();
+            headAnim?.PlayIdle();
             yield break;
         }
 
-        // --------- Có apple -> GROW NGAY SAU HEAD ---------
+
         PlaySFX(sfxEat);
+        headAnim?.PlayEat();
         Destroy(appleToEat.gameObject);
 
-        // Chuỗi vị trí mới, dài hơn 1:
-        // new[0] = head mới
-        // new[1] = head cũ
-        // new[2..] = các đoạn cũ giữ nguyên
-        List<Vector3> newPositions = new List<Vector3>(oldCount + 1);
-        newPositions.Add(startPos[0] + dir3 * stepDistance); // head mới
-        newPositions.Add(startPos[0]);                       // body mới sau head
-        for (int i = 1; i < oldCount; i++)
-            newPositions.Add(startPos[i]);                   // phần còn lại
 
-        // Tạo body mới, chèn vào segments[1]
-        Transform newBody = Instantiate(
-            bodyPrefab,
-            newPositions[1],
-            Quaternion.identity,
-            segmentsParent
-        );
+        List<Vector3> newPositions = new List<Vector3>(oldCount + 1);
+        newPositions.Add(startPos[0] + dir3 * stepDistance);
+        newPositions.Add(startPos[0]);
+        for (int i = 1; i < oldCount; i++)
+            newPositions.Add(startPos[i]);
+
+
+        Transform newBody = Instantiate(bodyPrefab, newPositions[1], Quaternion.identity, segmentsParent);
         segments.Insert(1, newBody);
 
-        // Áp vị trí mới cho toàn bộ segments
+
         for (int i = 0; i < segments.Count; i++)
             segments[i].position = newPositions[i];
+
 
         if (CheckSpikeHit() || CheckFinish())
         {
@@ -263,8 +265,10 @@ public class SnakeController : MonoBehaviour
             yield break;
         }
 
+
         moveSucceeded = true;
         UpdateSegmentRotations();
+        headAnim?.PlayIdle();
     }
 
     // =========================================================
@@ -520,25 +524,26 @@ public class SnakeController : MonoBehaviour
         if (isDead || isWin) return;
         isDead = true;
 
+
         PlaySFX(sfxDie);
-        //StopMusic();
+        headAnim?.PlayDie();
         LunaManager.ins.ShowEndCard(2f);
         PlayLoseSound();
         Debug.Log("GAME OVER (Spike)");
-        // TODO: gọi UI / reload level
     }
+
 
     void WinGame()
     {
         if (isWin || isDead) return;
         isWin = true;
 
+
         LunaManager.ins.ShowWinCard(2f);
         PlaySFX(sfxGate);
         StopMusic();
         PlayWinSound();
         Debug.Log("WIN! (GateFinish)");
-        // TODO: chuyển level / hiện màn thắng
     }
 
     // =========================================================

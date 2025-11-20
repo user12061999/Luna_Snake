@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5621897992522015638}
   - component: {fileID: 4652481927607068253}
   - component: {fileID: 5127141652614754699}
+  - component: {fileID: 8661841483255197281}
   m_Layer: 7
   m_Name: Head
   m_TagString: Untagged
@@ -146,6 +147,25 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.0001, y: 0.0001}
   m_EdgeRadius: 0
+--- !u!114 &8661841483255197281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1193016429676856711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2007d35e7acbac4c9d0b22696b9677b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skeletonAnim: {fileID: 7194407114439835584}
+  skeletonData: {fileID: 11400000, guid: be559bb3c63702f47ab11abcaa18e2b9, type: 2}
+  idle: idle
+  idleToEat: idle_to_eat
+  eat: eat
+  die: die
+  stuck: idle_to_stuck
 --- !u!1 &1432539538818277768
 GameObject:
   m_ObjectHideFlags: 0
@@ -208,7 +228,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 0c3867fb5d78359439bd4b159a8e347f, type: 2}
+  - {fileID: 2100000, guid: b7fac98aa5e87694d9e1083ff9ad86dd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -261,9 +281,11 @@ MonoBehaviour:
   calculateTangents: 0
   maskInteraction: 2
   maskMaterials:
-    materialsMaskDisabled: []
+    materialsMaskDisabled:
+    - {fileID: 2100000, guid: 0c3867fb5d78359439bd4b159a8e347f, type: 2}
     materialsInsideMask: []
-    materialsOutsideMask: []
+    materialsOutsideMask:
+    - {fileID: 2100000, guid: b7fac98aa5e87694d9e1083ff9ad86dd, type: 2}
   disableRenderingOnOverride: 1
   updateTiming: 1
   unscaledTime: 0
