@@ -21,6 +21,24 @@ public class SnakeController : MonoBehaviour
     public LayerMask segmentMask;   // layer của các segment rắn
     public LayerMask spikeMask;     // layer Spike
     public LayerMask finishMask;    // layer GateFinish
+    public LayerMask appleMask;    // layer GateFinish
+
+    [Header("Audio - SFX")]
+    public AudioSource sfxSource;
+    public AudioClip sfxMove;
+    public AudioClip sfxCantMove;
+    public AudioClip sfxFall;
+    public AudioClip sfxEat;
+    public AudioClip sfxDie;
+    public AudioClip sfxGate;
+
+    [Header("Audio - Music")]
+    public AudioSource musicSource;
+    public AudioClip musicClip;
+    public AudioClip loseMusicClip;
+    public AudioClip winMusicClip;
+
+    private bool musicStarted = false;
 
     private List<Transform> segments = new List<Transform>(); // [0] = head, [last] = tail
     private Vector2 moveDir = Vector2.right;
@@ -28,28 +46,59 @@ public class SnakeController : MonoBehaviour
     private bool moveSucceeded = false;
     private bool isDead = false;
     private bool isWin = false;
+    [Header("Finish Gate")]
+    public float gateSuckDurationPerSegment = 0.08f; // thời gian mỗi segment bị hút
+
+    private bool isFinishing = false; // đang trong animation chui vào cổng
 
     void Start()
     {
         SpawnInitialSnake();
     }
-
     void Update()
     {
-        if (isBusy || isDead || isWin) return;
+        // Test input từ keyboard
+        if (Input.GetKeyDown(KeyCode.W))
+            OnMoveUp();
+        else if (Input.GetKeyDown(KeyCode.S))
+            OnMoveDown();
+        else if (Input.GetKeyDown(KeyCode.A))
+            OnMoveLeft();
+        else if (Input.GetKeyDown(KeyCode.D))
+            OnMoveRight();
+    }
+    // =========================
+    // UI INPUT
+    // =========================
+    public void OnMoveUp()
+    {
+        TryStartMove(Vector2.up);
+    }
 
-        Vector2 inputDir = Vector2.zero;
+    public void OnMoveDown()
+    {
+        TryStartMove(Vector2.down);
+    }
 
-        if (Input.GetKeyDown(KeyCode.W)) inputDir = Vector2.up;
-        else if (Input.GetKeyDown(KeyCode.S)) inputDir = Vector2.down;
-        else if (Input.GetKeyDown(KeyCode.A)) inputDir = Vector2.left;
-        else if (Input.GetKeyDown(KeyCode.D)) inputDir = Vector2.right;
+    public void OnMoveLeft()
+    {
+        TryStartMove(Vector2.left);
+    }
 
-        if (inputDir != Vector2.zero)
-        {
-            moveDir = inputDir.normalized;
-            StartCoroutine(PerformStepWithGravity());
-        }
+    public void OnMoveRight()
+    {
+        TryStartMove(Vector2.right);
+    }
+
+    void TryStartMove(Vector2 dir)
+    {
+        if (isBusy || isDead || isWin || isFinishing) return;
+        if (dir == Vector2.zero) return;
+
+        moveDir = dir.normalized;
+
+        StartMusicIfNeeded();
+        StartCoroutine(PerformStepWithGravity());
     }
 
     // =========================================================
@@ -113,10 +162,17 @@ public class SnakeController : MonoBehaviour
 
         Vector3 dir3 = new Vector3(moveDir.x, moveDir.y, 0f);
 
-        // Block bởi tường + chính cơ thể
+        // Block bởi tường + ground + chính cơ thể + spike (không đi xuyên ngang)
         LayerMask blockMask = wallMask | groundMask | segmentMask | spikeMask;
         if (Physics2D.Raycast(segments[0].position, dir3, stepDistance, blockMask))
+        {
+            PlaySFX(sfxCantMove);
             yield break;
+        }
+            
+
+        // có thể di chuyển -> play SFX move
+        PlaySFX(sfxMove);
 
         // Check apple phía trước
         Collider2D appleToEat = null;
@@ -175,6 +231,7 @@ public class SnakeController : MonoBehaviour
         }
 
         // --------- Có apple -> GROW NGAY SAU HEAD ---------
+        PlaySFX(sfxEat);
         Destroy(appleToEat.gameObject);
 
         // Chuỗi vị trí mới, dài hơn 1:
@@ -217,6 +274,9 @@ public class SnakeController : MonoBehaviour
     {
         while (ShouldFallOneUnit())
         {
+            // rơi 1 “ô” -> SFX fall
+            PlaySFX(sfxFall);
+
             List<Vector3> startPos = GetPositions();
             List<Vector3> targetPos = new List<Vector3>(startPos.Count);
             for (int i = 0; i < startPos.Count; i++)
@@ -239,24 +299,22 @@ public class SnakeController : MonoBehaviour
                 segments[i].position = targetPos[i];
 
             if (CheckSpikeHit() || CheckFinish())
-            {
                 yield break;
-            }
         }
     }
 
-
     bool ShouldFallOneUnit()
     {
-        LayerMask supportMask = groundMask | wallMask | finishMask;
+        // Spike không phải là điểm tựa
+        LayerMask supportMask = groundMask | wallMask | finishMask| appleMask;
 
         for (int i = 0; i < segments.Count; i++)
         {
             if (Physics2D.Raycast(
-                    segments[i].position,
-                    Vector2.down,
-                    stepDistance * 0.9f,
-                    supportMask))
+                segments[i].position,
+                Vector2.down,
+                stepDistance * 0.9f,
+                supportMask))
             {
                 return false;
             }
@@ -264,18 +322,15 @@ public class SnakeController : MonoBehaviour
         return true;
     }
 
-
-
     // =========================================================
     // SPIKE & FINISH
     // =========================================================
+    // Chỉ GameOver khi CÓ spike bên dưới nhưng KHÔNG segment nào có điểm tựa an toàn
     bool CheckSpikeHit()
     {
-        // GameOver nếu: có ÍT NHẤT 1 spike làm điểm tựa
-        // và KHÔNG có bất kỳ điểm tựa an toàn nào (ground/wall/finish) cho cả con rắn
         float checkDist = stepDistance * 0.9f;
 
-        LayerMask safeSupportMask = groundMask | wallMask | finishMask;
+        LayerMask safeSupportMask = groundMask | wallMask | finishMask | appleMask;
         LayerMask combinedMask = safeSupportMask | spikeMask;
 
         bool hasAnySpikeSupport = false;
@@ -285,7 +340,6 @@ public class SnakeController : MonoBehaviour
         {
             Transform seg = segments[i];
 
-            // RaycastAll xuống dưới để xem dưới mỗi segment có gì
             RaycastHit2D[] hits = Physics2D.RaycastAll(
                 seg.position,
                 Vector2.down,
@@ -296,7 +350,6 @@ public class SnakeController : MonoBehaviour
             foreach (var hit in hits)
             {
                 if (hit.collider == null) continue;
-
                 int hitLayerMask = 1 << hit.collider.gameObject.layer;
 
                 if ((spikeMask & hitLayerMask) != 0)
@@ -307,7 +360,6 @@ public class SnakeController : MonoBehaviour
             }
         }
 
-        // Có spike nhưng KHÔNG có bất kỳ điểm tựa an toàn nào -> chết
         if (hasAnySpikeSupport && !hasAnySafeSupport)
         {
             GameOver();
@@ -317,28 +369,161 @@ public class SnakeController : MonoBehaviour
         return false;
     }
 
-
-
-
     bool CheckFinish()
     {
-        // chỉ cần head chạm GateFinish là win
+        // nếu đã bắt đầu hút rồi thì coi như "đã trúng cổng"
+        if (isFinishing) return true;
+
         float radius = stepDistance * 0.45f;
         Transform head = segments[0];
 
         Collider2D hit = Physics2D.OverlapCircle(head.position, radius, finishMask);
-        if (hit != null || (hit != null && hit.CompareTag("GateFinish")))
+        if (hit != null)
         {
-            WinGame();
-            return true;
+            StartFinishSequence(hit);
+            return true; // báo cho move/gravity dừng lại
         }
         return false;
+    }
+    void StartFinishSequence(Collider2D gate)
+    {
+        if (isFinishing) return;
+        isFinishing = true;
+
+        PlaySFX(sfxGate);
+        StopMusic();
+
+        Vector3 gatePos = gate.bounds.center;
+
+        // bắt đầu hút bằng di chuyển kiểu rắn
+        StartCoroutine(SnakeMoveIntoGate(gatePos));
+    }
+    IEnumerator SnakeMoveIntoGate(Vector3 gatePos)
+    {
+        isBusy = true;
+
+        // hướng từ head -> gate
+        while (segments.Count > 0)
+        {
+            // bước di chuyển
+            Vector3 dir = (gatePos - segments[0].position);
+            if (dir.magnitude < stepDistance * 0.5f)
+            {
+                // HEAD đã vào cổng -> ẩn head
+                HideSegment(0);
+                continue;
+            }
+
+            Vector3 stepDir = GetStepDirection(dir);
+
+            // di chuyển từng bước như MoveOneStepAnimated()
+            yield return StartCoroutine(MoveOneStepTowards(stepDir, gatePos));
+
+            // nếu head tới cổng → ẩn dần
+            if ((segments[0].position - gatePos).sqrMagnitude < 0.1f)
+            {
+                HideSegment(0);
+            }
+        }
+
+        // tất cả đã vào cổng
+        WinGame();
+    }
+    Vector3 GetStepDirection(Vector3 dir)
+    {
+        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
+            return new Vector3(Mathf.Sign(dir.x), 0, 0);
+
+        return new Vector3(0, Mathf.Sign(dir.y), 0);
+    }
+
+    void HideSegment(int index)
+    {
+        Transform seg = segments[index];
+
+        var rend = seg.GetComponent<Renderer>();
+        if (rend != null) rend.enabled = false;
+
+        var col = seg.GetComponent<Collider2D>();
+        if (col != null) col.enabled = false;
+
+        segments.RemoveAt(index);
+        Destroy(seg.gameObject);
+    }
+
+    IEnumerator AbsorbIntoGate(Vector3 gatePos)
+    {
+        isBusy = true;  // chặn mọi logic khác
+
+        // duyệt từ head -> tail
+        for (int i = 0; i < segments.Count; i++)
+        {
+            Transform seg = segments[i];
+            if (seg == null) continue;
+
+            Vector3 start = seg.position;
+            float t = 0f;
+
+            // lerp segment vào tâm cổng
+            while (t < gateSuckDurationPerSegment)
+            {
+                t += Time.deltaTime;
+                float a = Mathf.Clamp01(t / gateSuckDurationPerSegment);
+                seg.position = Vector3.Lerp(start, gatePos, a);
+                yield return null;
+            }
+
+            // ẩn segment khi đã "vào trong cổng"
+            var rend = seg.GetComponent<Renderer>();
+            if (rend != null) rend.enabled = false;
+            var col = seg.GetComponent<Collider2D>();
+            if (col != null) col.enabled = false;
+            yield return new WaitForSeconds(0.02f);
+        }
+
+        // khi tất cả đã chui vào cổng -> win
+        WinGame();
+    }
+
+    IEnumerator MoveOneStepTowards(Vector3 stepDir, Vector3 gatePos)
+    {
+        List<Vector3> startPos = GetPositions();
+        int count = startPos.Count;
+
+        // target = như rắn di chuyển
+        List<Vector3> target = new List<Vector3>(startPos);
+        target[0] = startPos[0] + stepDir * stepDistance;
+
+        for (int i = 1; i < count; i++)
+            target[i] = startPos[i - 1];
+
+        // animate
+        float t = 0f;
+        while (t < moveDuration)
+        {
+            t += Time.deltaTime;
+            float a = t / moveDuration;
+
+            for (int i = 0; i < count; i++)
+                segments[i].position = Vector3.Lerp(startPos[i], target[i], a);
+
+            yield return null;
+        }
+
+        // snap
+        for (int i = 0; i < count; i++)
+            segments[i].position = target[i];
     }
 
     void GameOver()
     {
         if (isDead || isWin) return;
         isDead = true;
+
+        PlaySFX(sfxDie);
+        //StopMusic();
+        LunaManager.ins.ShowEndCard(2f);
+        PlayLoseSound();
         Debug.Log("GAME OVER (Spike)");
         // TODO: gọi UI / reload level
     }
@@ -347,8 +532,57 @@ public class SnakeController : MonoBehaviour
     {
         if (isWin || isDead) return;
         isWin = true;
+
+        LunaManager.ins.ShowWinCard(2f);
+        PlaySFX(sfxGate);
+        StopMusic();
+        PlayWinSound();
         Debug.Log("WIN! (GateFinish)");
         // TODO: chuyển level / hiện màn thắng
+    }
+
+    // =========================================================
+    // AUDIO UTILS
+    // =========================================================
+    void PlaySFX(AudioClip clip)
+    {
+        if (clip == null || sfxSource == null) return;
+        sfxSource.PlayOneShot(clip);
+    }
+
+    void StartMusicIfNeeded()
+    {
+        if (musicStarted) return;
+        if (musicSource == null || musicClip == null) return;
+
+        musicSource.clip = musicClip;
+        musicSource.loop = true;
+        musicSource.Play();
+        musicStarted = true;
+    }
+
+    public void PlayLoseSound()
+    {
+        if (musicSource == null) return;
+
+        musicSource.clip = loseMusicClip;
+        musicSource.loop = false;
+        musicSource.Play();
+    }
+    public void PlayWinSound()
+    {
+        if (musicSource == null) return;
+
+        musicSource.clip = winMusicClip;
+        musicSource.loop = false;
+        musicSource.Play();
+    }
+    void StopMusic()
+    {
+        if (musicSource != null && musicSource.isPlaying)
+        {
+            musicSource.Stop();
+        }
     }
 
     // =========================================================
@@ -388,7 +622,6 @@ public class SnakeController : MonoBehaviour
         }
     }
 
-    // tiện debug vùng OverlapCircle
     void OnDrawGizmosSelected()
     {
         if (segments == null || segments.Count == 0) return;
