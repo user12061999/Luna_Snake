@@ -18,44 +18,22 @@ public class SnakeCollision : MonoBehaviour
     {
         float checkDist = controller.stepDistance * 0.9f;
 
-        LayerMask safeSupportMask = controller.groundMask | controller.wallMask | controller.finishMask | controller.appleMask;
-        LayerMask combinedMask    = safeSupportMask | controller.spikeMask;
-
-        bool hasAnySpikeSupport = false;
-        bool hasAnySafeSupport  = false;
-
         for (int i = 0; i < controller.segments.Count; i++)
         {
             Transform seg = controller.segments[i];
 
-            RaycastHit2D[] hits = Physics2D.RaycastAll(
-                seg.position,
-                Vector2.down,
-                checkDist,
-                combinedMask
-            );
-
-            foreach (var hit in hits)
+            // ✅ Dùng OverlapCircle thay vì Raycast để kiểm tra *va chạm ngang*, không chỉ ở dưới
+            Collider2D spike = Physics2D.OverlapCircle(seg.position, controller.stepDistance * 0.4f, controller.spikeMask);
+            if (spike != null)
             {
-                if (hit.collider == null) continue;
-                int hitLayerMask = 1 << hit.collider.gameObject.layer;
-
-                if ((controller.spikeMask & hitLayerMask) != 0)
-                    hasAnySpikeSupport = true;
-
-                if ((safeSupportMask & hitLayerMask) != 0)
-                    hasAnySafeSupport = true;
+                GameOver();
+                return true;
             }
-        }
-
-        if (hasAnySpikeSupport && !hasAnySafeSupport)
-        {
-            GameOver();
-            return true;
         }
 
         return false;
     }
+
 
     // Spike không phải là điểm tựa
     public bool ShouldFallOneUnit()

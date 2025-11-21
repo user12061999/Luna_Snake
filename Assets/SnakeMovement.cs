@@ -32,6 +32,12 @@ public class SnakeMovement : MonoBehaviour
     {
         controller.isBusy = true;
         yield return StartCoroutine(MoveOneStepAnimated());
+        
+        if (collision.CheckSpikeHit())
+        {
+            controller.moveSucceeded = false;
+            yield break;
+        }
         if (!controller.moveSucceeded || controller.isDead || controller.isWin)
         {
             controller.isBusy = false;
@@ -48,9 +54,7 @@ public class SnakeMovement : MonoBehaviour
         controller.moveSucceeded = false;
         Vector3 dir3 = new Vector3(controller.moveDir.x, controller.moveDir.y, 0f);
         LayerMask
-            blockMask = controller.wallMask | controller.groundMask | controller.segmentMask |
-                        controller
-                            .spikeMask;
+            blockMask = controller.wallMask | controller.groundMask | controller.segmentMask;
         // kiểm tra va chạm phía trước, bỏ qua chính đầu rắn 
         bool blocked = false;
         RaycastHit2D[] blockHits =
@@ -129,13 +133,13 @@ public class SnakeMovement : MonoBehaviour
             visuals.UpdateSegmentRotations();
             yield return null;
         }
-
-        for (int i = 0; i < controller.segments.Count; i++) controller.segments[i].position = targetPos[i];
+        yield return null;
         if (collision.CheckSpikeHit() || collision.CheckFinish())
         {
             controller.moveSucceeded = false;
             yield break;
         }
+        for (int i = 0; i < controller.segments.Count; i++) controller.segments[i].position = targetPos[i];
 
         if (!willGrow)
         {
@@ -156,6 +160,7 @@ public class SnakeMovement : MonoBehaviour
             controller.segmentsParent);
         controller.segments.Insert(1, newBody);
         for (int i = 0; i < controller.segments.Count; i++) controller.segments[i].position = newPositions[i];
+        yield return null;
         if (collision.CheckSpikeHit() || collision.CheckFinish())
         {
             controller.moveSucceeded = false;
@@ -194,6 +199,7 @@ public class SnakeMovement : MonoBehaviour
             }
 
             for (int i = 0; i < controller.segments.Count; i++) controller.segments[i].position = targetPos[i];
+            yield return null;
             if (collision.CheckSpikeHit() || collision.CheckFinish()) yield break;
         }
     }
