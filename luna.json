@@ -1,8 +1,8 @@
 {
     "version": "6.4.0",
     "projectId": "8f5d959877bf4014b979a7e0e370f4e5",
-    "applicationID": 29138,
-    "creativeName": "",
+    "applicationID": 34675,
+    "creativeName": "WPSAG_NgocBTU_ToiNV_V01",
     "pgServer": "EU",
     "window": {
         "‐′": true
@@ -32520,7 +32520,7 @@
                     },
                     {
                         "name": "SetActiveLoseCard",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "OnClickEndCard",
@@ -32561,100 +32561,20 @@
                         "excluded": false
                     },
                     {
-                        "name": "TryStartMove",
-                        "excluded": false
-                    },
-                    {
                         "name": "SpawnInitialSnake",
                         "excluded": false
                     },
                     {
-                        "name": "PerformStepWithGravity",
+                        "name": "Awake",
                         "excluded": false
                     },
                     {
-                        "name": "MoveOneStepAnimated",
+                        "name": "HandleInput",
                         "excluded": false
                     },
                     {
-                        "name": "ApplyGravityAnimated",
+                        "name": "CheckAppleAroundHead",
                         "excluded": false
-                    },
-                    {
-                        "name": "ShouldFallOneUnit",
-                        "excluded": false
-                    },
-                    {
-                        "name": "CheckSpikeHit",
-                        "excluded": false
-                    },
-                    {
-                        "name": "CheckFinish",
-                        "excluded": false
-                    },
-                    {
-                        "name": "StartFinishSequence",
-                        "excluded": false
-                    },
-                    {
-                        "name": "SnakeMoveIntoGate",
-                        "excluded": false
-                    },
-                    {
-                        "name": "GetStepDirection",
-                        "excluded": false
-                    },
-                    {
-                        "name": "HideSegment",
-                        "excluded": false
-                    },
-                    {
-                        "name": "AbsorbIntoGate",
-                        "excluded": true
-                    },
-                    {
-                        "name": "MoveOneStepTowards",
-                        "excluded": false
-                    },
-                    {
-                        "name": "GameOver",
-                        "excluded": true
-                    },
-                    {
-                        "name": "WinGame",
-                        "excluded": false
-                    },
-                    {
-                        "name": "PlaySFX",
-                        "excluded": false
-                    },
-                    {
-                        "name": "StartMusicIfNeeded",
-                        "excluded": false
-                    },
-                    {
-                        "name": "PlayLoseSound",
-                        "excluded": true
-                    },
-                    {
-                        "name": "PlayWinSound",
-                        "excluded": false
-                    },
-                    {
-                        "name": "StopMusic",
-                        "excluded": false
-                    },
-                    {
-                        "name": "GetPositions",
-                        "excluded": false
-                    },
-                    {
-                        "name": "UpdateSegmentRotations",
-                        "excluded": false
-                    },
-                    {
-                        "name": "OnDrawGizmosSelected",
-                        "excluded": true
                     }
                 ]
             },
@@ -33409,6 +33329,248 @@
                         "excluded": true
                     }
                 ]
+            },
+            {
+                "className": "PushableRock",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "init",
+                        "excluded": false
+                    },
+                    {
+                        "name": "Update",
+                        "excluded": true
+                    },
+                    {
+                        "name": "ShouldFallOneUnit",
+                        "excluded": true
+                    },
+                    {
+                        "name": "FallOneUnit",
+                        "excluded": true
+                    },
+                    {
+                        "name": "TryPush",
+                        "excluded": true
+                    },
+                    {
+                        "name": "GetColliderHalfExtent",
+                        "excluded": true
+                    }
+                ]
+            },
+            {
+                "className": "SnakeAudio",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "init",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayMove",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayCantMove",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayFall",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayEat",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayDieSFX",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayGateSFX",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlaySFX",
+                        "excluded": false
+                    },
+                    {
+                        "name": "StartMusicIfNeeded",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayLoseMusic",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayWinMusic",
+                        "excluded": false
+                    },
+                    {
+                        "name": "StopMusic",
+                        "excluded": false
+                    }
+                ]
+            },
+            {
+                "className": "SnakeCollision",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "Awake",
+                        "excluded": false
+                    },
+                    {
+                        "name": "CheckSpikeHit",
+                        "excluded": false
+                    },
+                    {
+                        "name": "ShouldFallOneUnit",
+                        "excluded": false
+                    },
+                    {
+                        "name": "CheckFinish",
+                        "excluded": false
+                    },
+                    {
+                        "name": "StartFinishSequence",
+                        "excluded": false
+                    },
+                    {
+                        "name": "SnakeMoveIntoGate",
+                        "excluded": false
+                    },
+                    {
+                        "name": "GetStepDirection",
+                        "excluded": false
+                    },
+                    {
+                        "name": "HideSegment",
+                        "excluded": false
+                    },
+                    {
+                        "name": "AbsorbIntoGate",
+                        "excluded": true
+                    },
+                    {
+                        "name": "MoveOneStepTowards",
+                        "excluded": false
+                    },
+                    {
+                        "name": "GameOver",
+                        "excluded": false
+                    },
+                    {
+                        "name": "WinGame",
+                        "excluded": false
+                    }
+                ]
+            },
+            {
+                "className": "SnakeHeadAnimator",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "Play",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayIdle",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayIdleToEat",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayEat",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayDie",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PlayStuck",
+                        "excluded": false
+                    }
+                ]
+            },
+            {
+                "className": "SnakeMovement",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "Awake",
+                        "excluded": false
+                    },
+                    {
+                        "name": "TryStartMove",
+                        "excluded": false
+                    },
+                    {
+                        "name": "PerformStepWithGravity",
+                        "excluded": false
+                    },
+                    {
+                        "name": "MoveOneStepAnimated",
+                        "excluded": false
+                    },
+                    {
+                        "name": "BlockMove",
+                        "excluded": false
+                    },
+                    {
+                        "name": "ApplyGravityAnimated",
+                        "excluded": false
+                    },
+                    {
+                        "name": "GetPositions",
+                        "excluded": false
+                    }
+                ]
+            },
+            {
+                "className": "SnakeSegmentRenderer",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "init",
+                        "excluded": false
+                    },
+                    {
+                        "name": "Awake",
+                        "excluded": false
+                    },
+                    {
+                        "name": "UpdateSprite",
+                        "excluded": false
+                    },
+                    {
+                        "name": "GetAngleFromDirection",
+                        "excluded": false
+                    }
+                ]
+            },
+            {
+                "className": "SnakeVisuals",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "Awake",
+                        "excluded": false
+                    },
+                    {
+                        "name": "UpdateSegmentRotations",
+                        "excluded": false
+                    },
+                    {
+                        "name": "OnDrawGizmosSelected",
+                        "excluded": true
+                    }
+                ]
             }
         ],
         "stubberDataList": [],
@@ -33476,6 +33638,36 @@
                         "script": "",
                         "ext": "",
                         "name": "Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset"
+                    },
+                    {
+                        "maxWidth": 2048,
+                        "maxHeight": 120,
+                        "format": "png32",
+                        "compression": "quantSize",
+                        "quality": 65,
+                        "script": "",
+                        "ext": "",
+                        "name": "Assets/Game/SpineAnimations/Ran.png"
+                    },
+                    {
+                        "maxWidth": 1024,
+                        "maxHeight": 1024,
+                        "format": "png32",
+                        "compression": "quantSize",
+                        "quality": 65,
+                        "script": "",
+                        "ext": "",
+                        "name": "Assets/Texture2D/portal_soft01.png"
+                    },
+                    {
+                        "maxWidth": 1024,
+                        "maxHeight": 1024,
+                        "format": "png32",
+                        "compression": "quantSize",
+                        "quality": 65,
+                        "script": "",
+                        "ext": "",
+                        "name": "Assets/Texture2D/UI/header_win.png"
                     }
                 ]
             },
@@ -33489,7 +33681,18 @@
                     "script": "",
                     "ext": ""
                 },
-                "overrides": []
+                "overrides": [
+                    {
+                        "channels": 1,
+                        "startTime": "00:00.000",
+                        "endTime": "00:30.000",
+                        "lengthInSeconds": 30.0,
+                        "bitrate": 32,
+                        "script": "",
+                        "ext": "",
+                        "name": "Assets/Game/Sound/Nintendo Wii - Mii Channel Theme - gamemusicisgood.mp3"
+                    }
+                ]
             },
             "font": {
                 "default": {

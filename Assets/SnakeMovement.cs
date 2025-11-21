@@ -58,22 +58,57 @@ IEnumerator MoveOneStepAnimated()
     // kiểm tra va chạm phía trước, bỏ qua chính đầu rắn
     bool blocked = false;
     RaycastHit2D[] blockHits = Physics2D.RaycastAll(controller.segments[0].position, dir3, controller.stepDistance, blockMask);
+    blocked = false;
+    bool hasRockToPush = false;
+    PushableRock rockToPush = null;
+
     foreach (var hit in blockHits)
     {
         if (hit.collider != null && hit.collider.transform != controller.segments[0])
         {
-            blocked = true;
-            break;
+            // Nếu là Rock thì thử đẩy
+            if (hit.collider.CompareTag("Rock"))
+            {
+                rockToPush = hit.collider.GetComponent<PushableRock>();
+                hasRockToPush = true;
+            }
+            else
+            {
+                blocked = true;
+                break;
+            }
         }
     }
 
+// Nếu bị chặn bởi vật khác ngoài Rock → không di chuyển
     if (blocked)
     {
         BlockMove();
         yield break;
     }
 
+// Nếu có Rock thì thử đẩy
+    if (hasRockToPush && rockToPush != null)
+    {
+        Vector3 oldRockPos = rockToPush.transform.position;
 
+        yield return StartCoroutine(rockToPush.TryPush(controller.moveDir));
+
+        // Đợi 1 frame để Unity update collider (an toàn)
+        yield return null;
+
+        Vector3 newRockPos = rockToPush.transform.position;
+
+        // Nếu rock không di chuyển, coi như đẩy thất bại
+        if (Vector3.Distance(oldRockPos, newRockPos) < 0.01f)
+        {
+            BlockMove();
+            yield break;
+        }
+
+        // Nếu rock đã đẩy thành công → tiếp tục move rắn
+    }
+    
     audio.PlayMove();
 
     // kiểm tra táo để grow
