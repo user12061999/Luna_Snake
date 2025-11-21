@@ -2,90 +2,43 @@ using UnityEngine;
 
 public class SnakeSegmentRenderer : MonoBehaviour
 {
-    [Header("Sprite Variants")]
-    public SnakeSegmentSprites sprites;
+    [Header("Body Sprite (only 1)")]
+    public Sprite bodySprite;   // sprite thân, vẽ mặc định sang PHẢI hoặc TRÁI
+
+    [Tooltip("Nếu sprite gốc vẽ sang TRÁI thì set = 180, vẽ sang LÊN thì = 90, vẽ sang XUỐNG thì = -90.")]
+    public float angleOffset = 0f;
 
     private SpriteRenderer rend;
-    private Transform cachedTransform;
 
     void Awake()
     {
         rend = GetComponent<SpriteRenderer>();
-        cachedTransform = transform;
     }
 
-    public void UpdateSprite(Vector2 dirFrom, Vector2 dirTo)
+    /// <summary>
+    /// toHead: vector từ segment hiện tại -> segment phía HEAD
+    /// toTail: vector từ segment hiện tại -> segment phía TAIL
+    /// </summary>
+    public void UpdateSprite(Vector2 toHead, Vector2 toTail)
     {
-        if (rend == null || sprites == null) return;
+        if (rend == null || bodySprite == null) return;
 
-        SegmentSpriteVariant variant = null;
+        rend.sprite = bodySprite;
 
-        if (IsStraight(dirFrom, dirTo))
-        {
-            if (Mathf.Abs(dirFrom.x) > 0.1f)
-                variant = sprites.straightHorizontal;
-            else
-                variant = sprites.straightVertical;
-        }
-        else
-        {
-            variant = GetCurveVariant(dirFrom, dirTo);
-        }
+        // luôn ưu tiên hướng BÒ (tail -> head)
+        Vector2 dir = toHead != Vector2.zero ? toHead.normalized
+            : (-toTail).normalized;
 
-        if (variant != null)
-        {
-            rend.sprite = GetSpriteFromVariant(variant, cachedTransform.eulerAngles.z);
-        }
+        float angle = GetAngleFromDirection(dir);
+        transform.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 
-    bool IsStraight(Vector2 a, Vector2 b)
+    float GetAngleFromDirection(Vector2 dir)
     {
-        return (a == b || a == -b);
+        if (dir == Vector2.zero)
+            return angleOffset;
+
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        return angle + angleOffset;
     }
-
-    SegmentSpriteVariant GetCurveVariant(Vector2 from, Vector2 to)
-    {
-        from = from.normalized;
-        to = to.normalized;
-
-        if ((from == Vector2.left && to == Vector2.up) || (from == Vector2.down && to == Vector2.right))
-            return sprites.curveBL;
-
-        if ((from == Vector2.right && to == Vector2.up) || (from == Vector2.down && to == Vector2.left))
-            return sprites.curveBR;
-
-        if ((from == Vector2.left && to == Vector2.down) || (from == Vector2.up && to == Vector2.right))
-            return sprites.curveTL;
-
-        if ((from == Vector2.right && to == Vector2.down) || (from == Vector2.up && to == Vector2.left))
-            return sprites.curveTR;
-
-        return null;
-    }
-
-    Sprite GetSpriteFromVariant(SegmentSpriteVariant variant, float rotationZ)
-    {
-        float z = rotationZ % 360f;
-        if (z < 0f) z += 360f;
-        bool lightOnTop = (z >= 0f && z < 180f);
-        return lightOnTop ? variant.lightOnTop : variant.darkOnTop;
-    }
-}
-
-[System.Serializable]
-public class SnakeSegmentSprites
-{
-    public SegmentSpriteVariant straightHorizontal;
-    public SegmentSpriteVariant straightVertical;
-    public SegmentSpriteVariant curveTR;
-    public SegmentSpriteVariant curveTL;
-    public SegmentSpriteVariant curveBR;
-    public SegmentSpriteVariant curveBL;
-}
-
-[System.Serializable]
-public class SegmentSpriteVariant
-{
-    public Sprite lightOnTop;
-    public Sprite darkOnTop;
 }
