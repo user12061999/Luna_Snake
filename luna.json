@@ -143,7 +143,14 @@
                 "Assets/Block_8_0.prefab",
                 "Assets/Block_3b_0.prefab",
                 "Assets/Texture2D/Map/Block_9a.png",
-                "Assets/TextMesh Pro/Resources/TMP Settings.asset"
+                "Assets/TextMesh Pro/Resources/TMP Settings.asset",
+                "Assets/Game/SpineAnimations/Ran.png",
+                "Assets/Game/SpineAnimations/Ran.atlas.txt",
+                "Assets/Game/SpineAnimations/Ran.json",
+                "Assets/Game/SpineAnimations/Ran_Material_OutsideMask.mat",
+                "Assets/Game/SpineAnimations/Ran_Material.mat",
+                "Assets/Game/SpineAnimations/Ran_Atlas.asset",
+                "Assets/Game/SpineAnimations/Ran_SkeletonData.asset"
             ]
         },
         "scenes": [
@@ -32449,32 +32456,6 @@
                 ]
             },
             {
-                "className": "CameraController",
-                "staticMethods": [],
-                "instanceMethods": [
-                    {
-                        "name": "init",
-                        "excluded": false
-                    },
-                    {
-                        "name": "Start",
-                        "excluded": false
-                    },
-                    {
-                        "name": "Update",
-                        "excluded": false
-                    },
-                    {
-                        "name": "UpdateCameraView",
-                        "excluded": false
-                    },
-                    {
-                        "name": "AdjustCamera",
-                        "excluded": false
-                    }
-                ]
-            },
-            {
                 "className": "LunaManager",
                 "staticMethods": [],
                 "instanceMethods": [
@@ -33356,6 +33337,18 @@
                     },
                     {
                         "name": "GetColliderHalfExtent",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Awake",
+                        "excluded": true
+                    },
+                    {
+                        "name": "ScheduleFallAfter",
+                        "excluded": true
+                    },
+                    {
+                        "name": "DelayAndFall",
                         "excluded": true
                     }
                 ]
