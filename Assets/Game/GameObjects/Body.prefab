@@ -160,6 +160,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodySprite: {fileID: 21300000, guid: 7d05a785a2abdc54aa6e9ceb0af5e51e, type: 3}
+  bodyTurnCW: {fileID: 21300000, guid: 2ecaa482be97b654eb8ae79a56157049, type: 3}
+  bodyTurnCCW: {fileID: 21300000, guid: adcffe1c60d37a34483a4617d730f93a, type: 3}
+  ccwExtraRotation: -90
+  angleOffset: 0
 --- !u!1 &5195900511257970683
 GameObject:
   m_ObjectHideFlags: 0
