@@ -11,9 +11,21 @@ public class PushableRock : MonoBehaviour
 
     private bool isFalling = false;
     private bool isMoving = false;
+    private int skipGravityFrames = 0;
+    Collider2D col;
 
+    void Awake()
+    {
+        col = GetComponent<Collider2D>();
+    }
     void Update()
     {
+        if (skipGravityFrames > 0)
+        {
+            skipGravityFrames--;
+            return;
+        }
+
         if (!isMoving && !isFalling)
         {
             if (ShouldFallOneUnit())
@@ -23,11 +35,28 @@ public class PushableRock : MonoBehaviour
         }
     }
 
+
+
     bool ShouldFallOneUnit()
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, stepDistance * 0.9f, groundMask | blockMask);
+        Vector3 direction = Vector3.down;
+        float halfExtent = GetColliderHalfExtent(direction);
+
+        // điểm bắt đầu raycast: ngay dưới mép collider
+        Vector3 origin = transform.position + direction * halfExtent;
+
+        // ray chỉ cần kiểm tra 1 bước
+        float rayLength = stepDistance;
+
+        RaycastHit2D hit = Physics2D.Raycast(origin, direction, rayLength, groundMask | blockMask);
+
+        Debug.DrawRay(origin, direction * rayLength, Color.red, 0.1f);
+
         return hit.collider == null;
     }
+
+
+
 
     IEnumerator FallOneUnit()
     {
@@ -59,7 +88,7 @@ public class PushableRock : MonoBehaviour
         float halfExtent = GetColliderHalfExtent(dir3);
 
         // Điểm xuất phát raycast: lệch ra ngoài collider 1 chút theo hướng đẩy
-        Vector3 origin = transform.position + dir3 * halfExtent;
+        Vector3 origin = transform.position + dir3*1.01f * halfExtent;
         float distance = stepDistance - halfExtent;
 
         RaycastHit2D hit = Physics2D.Raycast(origin, dir3, distance, blockMask);
@@ -88,6 +117,12 @@ public class PushableRock : MonoBehaviour
 
         transform.position = target;
         isMoving = false;
+
+// ✅ Đợi 1 frame trước khi gravity kiểm tra lại
+        if (dir == Vector2.up)
+        {
+            ScheduleFallAfter(0.08f + 0.01f); // rắn rơi trước
+        }
     }
     float GetColliderHalfExtent(Vector3 direction)
     {
@@ -96,19 +131,39 @@ public class PushableRock : MonoBehaviour
         {
             Vector2 size = box.size;
             Vector2 scale = transform.lossyScale;
-
-            // Scale kích thước theo transform (phòng trường hợp object bị scale)
             Vector2 worldSize = new Vector2(size.x * scale.x, size.y * scale.y);
 
-            // Trả về half-extent theo hướng đẩy
-            if (Mathf.Abs(direction.x) > 0.1f)
-                return worldSize.x / 2f + 0.01f;
+            direction = direction.normalized;
+
+            // xác định hướng nào có extent
+            float extent = 0.5f;
+            if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+            {
+                extent = worldSize.x / 2f;
+            }
             else
-                return worldSize.y / 2f + 0.01f;
+            {
+                extent = worldSize.y / 2f;
+            }
+
+            return extent + 0.01f; // cộng nhỏ tránh ray trúng chính collider
         }
 
-        // fallback mặc định
         return 0.5f;
     }
 
+    public void ScheduleFallAfter(float delaySeconds)
+    {
+        StartCoroutine(DelayAndFall(delaySeconds));
+    }
+
+    IEnumerator DelayAndFall(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        while (!isMoving && !isFalling && ShouldFallOneUnit())
+        {
+            yield return StartCoroutine(FallOneUnit());
+        }
+    }
 }

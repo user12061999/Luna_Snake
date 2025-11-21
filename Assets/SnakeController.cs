@@ -34,16 +34,17 @@ public class SnakeController : MonoBehaviour
     [HideInInspector] public bool isDead = false;
     [HideInInspector] public bool isWin = false;
     [HideInInspector] public bool isFinishing = false;
-    [HideInInspector] public SnakeHeadAnimator headAnim; 
+    [HideInInspector] public SnakeHeadAnimator headAnim;
 
     // ---- THAM CHIẾU CÁC MODULE KHÁC ----
     private SnakeMovement movement;
     private SnakeCollision collision;
     private SnakeAudio audio;
     private SnakeVisuals visuals;
-
+    public float inputCooldown = 0f;
     void Awake()
     {
+        
         movement  = GetComponent<SnakeMovement>();
         collision = GetComponent<SnakeCollision>();
         audio     = GetComponent<SnakeAudio>();
@@ -57,12 +58,20 @@ public class SnakeController : MonoBehaviour
 
     void Update()
     {
-        HandleInput();
+        inputCooldown -= Time.deltaTime;
+
+        if (!isBusy && inputCooldown <= 0f)
+        {
+            HandleInput();
+        }
+
         CheckAppleAroundHead();
     }
 
     void HandleInput()
     {
+        if (isBusy) return; // ✅ ngăn nhận input khi đang di chuyển
+
         if (Input.GetKeyDown(KeyCode.W)) OnMoveUp();
         else if (Input.GetKeyDown(KeyCode.S)) OnMoveDown();
         else if (Input.GetKeyDown(KeyCode.A)) OnMoveLeft();
@@ -102,6 +111,7 @@ public class SnakeController : MonoBehaviour
     // ============== CHECK APPLE XUNG QUANH HEAD =========
     void CheckAppleAroundHead()
     {
+        if (isDead) return;
         if (segments.Count == 0 || headAnim == null) return;
 
         Vector3[] directions = new Vector3[]
