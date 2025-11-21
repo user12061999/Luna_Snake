@@ -47,109 +47,119 @@ public class SnakeMovement : MonoBehaviour
     }
 
     // ================= ONE STEP + EAT/GROW ===========
-    IEnumerator MoveOneStepAnimated()
+    // ✅ SnakeMovement.cs (đã sửa để đẩy rock và đợi rock di chuyển xong)
+IEnumerator MoveOneStepAnimated()
+{
+    controller.moveSucceeded = false;
+
+    Vector3 dir3 = new Vector3(controller.moveDir.x, controller.moveDir.y, 0f);
+    LayerMask blockMask = controller.wallMask | controller.groundMask | controller.segmentMask | controller.spikeMask;
+
+    // kiểm tra va chạm phía trước, bỏ qua chính đầu rắn
+    bool blocked = false;
+    RaycastHit2D[] blockHits = Physics2D.RaycastAll(controller.segments[0].position, dir3, controller.stepDistance, blockMask);
+    foreach (var hit in blockHits)
+    {
+        if (hit.collider != null && hit.collider.transform != controller.segments[0])
+        {
+            blocked = true;
+            break;
+        }
+    }
+
+    if (blocked)
+    {
+        BlockMove();
+        yield break;
+    }
+
+
+    audio.PlayMove();
+
+    // kiểm tra táo để grow
+    Collider2D appleToEat = null;
+    RaycastHit2D[] hits = Physics2D.RaycastAll(controller.segments[0].position, dir3, controller.stepDistance);
+    foreach (var hit in hits)
+    {
+        if (hit.collider != null && hit.collider.CompareTag("Apple"))
+        {
+            appleToEat = hit.collider;
+            break;
+        }
+    }
+    bool willGrow = (appleToEat != null);
+
+    List<Vector3> startPos = GetPositions();
+    int oldCount = startPos.Count;
+    List<Vector3> targetPos = new List<Vector3>(startPos);
+    targetPos[0] = startPos[0] + dir3 * controller.stepDistance;
+    for (int i = 1; i < oldCount; i++)
+        targetPos[i] = startPos[i - 1];
+
+    float t = 0f;
+    while (t < controller.moveDuration)
+    {
+        t += Time.deltaTime;
+        float a = Mathf.Clamp01(t / controller.moveDuration);
+        for (int i = 0; i < controller.segments.Count; i++)
+            controller.segments[i].position = Vector3.Lerp(startPos[i], targetPos[i], a);
+
+        visuals.UpdateSegmentRotations();
+        yield return null;
+    }
+
+    for (int i = 0; i < controller.segments.Count; i++)
+        controller.segments[i].position = targetPos[i];
+
+    if (collision.CheckSpikeHit() || collision.CheckFinish())
     {
         controller.moveSucceeded = false;
+        yield break;
+    }
 
-        Vector3 dir3 = new Vector3(controller.moveDir.x, controller.moveDir.y, 0f);
-        LayerMask blockMask = controller.wallMask | controller.groundMask | controller.segmentMask | controller.spikeMask;
-
-        // chặn bước nếu phía trước là block (tường / ground / segment / spike)
-        if (Physics2D.Raycast(controller.segments[0].position, dir3, controller.stepDistance, blockMask))
-        {
-            audio.PlayCantMove();
-            controller.headAnim?.PlayStuck();
-            yield break;
-        }
-
-        audio.PlayMove();
-
-        // check Apple để biết có grow không
-        Collider2D appleToEat = null;
-        RaycastHit2D[] hits = Physics2D.RaycastAll(controller.segments[0].position, dir3, controller.stepDistance);
-        foreach (var hit in hits)
-        {
-            if (hit.collider != null && hit.collider.CompareTag("Apple"))
-            {
-                appleToEat = hit.collider;
-                break;
-            }
-        }
-        bool willGrow = (appleToEat != null);
-
-        // lưu vị trí ban đầu
-        List<Vector3> startPos = GetPositions();
-        int oldCount = startPos.Count;
-        List<Vector3> targetPos = new List<Vector3>(startPos);
-
-        // target: head tiến 1 ô, các segment follow
-        targetPos[0] = startPos[0] + dir3 * controller.stepDistance;
-        for (int i = 1; i < oldCount; i++)
-            targetPos[i] = startPos[i - 1];
-
-        // lerp di chuyển
-        float t = 0f;
-        while (t < controller.moveDuration)
-        {
-            t += Time.deltaTime;
-            float a = Mathf.Clamp01(t / controller.moveDuration);
-
-            for (int i = 0; i < controller.segments.Count; i++)
-                controller.segments[i].position = Vector3.Lerp(startPos[i], targetPos[i], a);
-
-            visuals.UpdateSegmentRotations();
-            yield return null;
-        }
-
-        // snap
-        for (int i = 0; i < controller.segments.Count; i++)
-            controller.segments[i].position = targetPos[i];
-
-        // check Spike / Finish
-        if (collision.CheckSpikeHit() || collision.CheckFinish())
-        {
-            controller.moveSucceeded = false;
-            yield break;
-        }
-
-        // không grow
-        if (!willGrow)
-        {
-            controller.moveSucceeded = true;
-            visuals.UpdateSegmentRotations();
-            controller.headAnim?.PlayIdle();
-            yield break;
-        }
-
-        // có grow
-        audio.PlayEat();
-        controller.headAnim?.PlayEat();
-        Destroy(appleToEat.gameObject);
-
-        // tính lại newPositions sau khi grow
-        List<Vector3> newPositions = new List<Vector3>(oldCount + 1);
-        newPositions.Add(startPos[0] + dir3 * controller.stepDistance); // head mới
-        newPositions.Add(startPos[0]);                                  // body mới sau head
-        for (int i = 1; i < oldCount; i++)
-            newPositions.Add(startPos[i]);
-
-        // spawn body mới
-        Transform newBody = Instantiate(controller.bodyPrefab, newPositions[1], Quaternion.identity, controller.segmentsParent);
-        controller.segments.Insert(1, newBody);
-
-        for (int i = 0; i < controller.segments.Count; i++)
-            controller.segments[i].position = newPositions[i];
-
-        if (collision.CheckSpikeHit() || collision.CheckFinish())
-        {
-            controller.moveSucceeded = false;
-            yield break;
-        }
-
+    if (!willGrow)
+    {
         controller.moveSucceeded = true;
         visuals.UpdateSegmentRotations();
         controller.headAnim?.PlayIdle();
+        yield break;
     }
+
+    // có ăn táo
+    audio.PlayEat();
+    controller.headAnim?.PlayEat();
+    Destroy(appleToEat.gameObject);
+
+    List<Vector3> newPositions = new List<Vector3>(oldCount + 1);
+    newPositions.Add(startPos[0] + dir3 * controller.stepDistance);
+    newPositions.Add(startPos[0]);
+    for (int i = 1; i < oldCount; i++)
+        newPositions.Add(startPos[i]);
+
+    Transform newBody = Instantiate(controller.bodyPrefab, newPositions[1], Quaternion.identity, controller.segmentsParent);
+    controller.segments.Insert(1, newBody);
+
+    for (int i = 0; i < controller.segments.Count; i++)
+        controller.segments[i].position = newPositions[i];
+
+    if (collision.CheckSpikeHit() || collision.CheckFinish())
+    {
+        controller.moveSucceeded = false;
+        yield break;
+    }
+
+    controller.moveSucceeded = true;
+    visuals.UpdateSegmentRotations();
+    controller.headAnim?.PlayIdle();
+}
+
+void BlockMove()
+{
+    audio.PlayCantMove();
+    controller.headAnim?.PlayStuck();
+}
+
+
 
     // ================= GRAVITY =======================
     IEnumerator ApplyGravityAnimated()

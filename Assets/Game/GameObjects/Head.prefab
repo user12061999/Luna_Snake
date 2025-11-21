@@ -145,7 +145,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.0001, y: 0.0001}
+  m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
 --- !u!114 &8661841483255197281
 MonoBehaviour:
@@ -228,7 +228,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b7fac98aa5e87694d9e1083ff9ad86dd, type: 2}
+  - {fileID: 2100000, guid: 0c3867fb5d78359439bd4b159a8e347f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -281,11 +281,9 @@ MonoBehaviour:
   calculateTangents: 0
   maskInteraction: 2
   maskMaterials:
-    materialsMaskDisabled:
-    - {fileID: 2100000, guid: 0c3867fb5d78359439bd4b159a8e347f, type: 2}
+    materialsMaskDisabled: []
     materialsInsideMask: []
-    materialsOutsideMask:
-    - {fileID: 2100000, guid: b7fac98aa5e87694d9e1083ff9ad86dd, type: 2}
+    materialsOutsideMask: []
   disableRenderingOnOverride: 1
   updateTiming: 1
   unscaledTime: 0
