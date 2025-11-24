@@ -1,169 +1,120 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PushableRock : MonoBehaviour
 {
-    public float fallDuration = 0.08f;
     public float stepDistance = 1f;
-    public LayerMask groundMask;
-    public LayerMask blockMask; // walls, segments, other rocks...
+    public float fallDuration = 0.08f;
+    public LayerMask supportMask;
 
-    private bool isFalling = false;
-    private bool isMoving = false;
-    private int skipGravityFrames = 0;
-    Collider2D col;
+    private bool isBusy = false;
 
-    void Awake()
+    public void TryApplyGravity()
     {
-        col = GetComponent<Collider2D>();
-    }
-    void Update()
-    {
-        if (skipGravityFrames > 0)
+        if (isBusy) return;
+        if (ShouldFall())
         {
-            skipGravityFrames--;
-            return;
-        }
-
-        if (!isMoving && !isFalling)
-        {
-            if (ShouldFallOneUnit())
-            {
-                StartCoroutine(FallOneUnit());
-            }
+            StartCoroutine(FallContinuously());
         }
     }
 
-
-
-    bool ShouldFallOneUnit()
+    public bool TryPush(Vector2 direction)
     {
-        Vector3 direction = Vector3.down;
-        float halfExtent = GetColliderHalfExtent(direction);
+        if (isBusy) return false;
 
-        // điểm bắt đầu raycast: ngay dưới mép collider
-        Vector3 origin = transform.position + direction * halfExtent;
+        Vector3 dir3 = direction.normalized;
+        Vector3 targetPos = transform.position + dir3 * stepDistance;
 
-        // ray chỉ cần kiểm tra 1 bước
-        float rayLength = stepDistance;
+        if (IsPositionBlocked(targetPos))
+            return false;
 
-        RaycastHit2D hit = Physics2D.Raycast(origin, direction, rayLength, groundMask | blockMask);
-
-        Debug.DrawRay(origin, direction * rayLength, Color.red, 0.1f);
-
-        return hit.collider == null;
+        StartCoroutine(PushRoutine(dir3));
+        return true;
     }
 
-
-
-
-    IEnumerator FallOneUnit()
+    IEnumerator PushRoutine(Vector3 dir)
     {
-        isFalling = true;
-
-        Vector3 start = transform.position;
-        Vector3 target = start + Vector3.down * stepDistance;
+        isBusy = true;
+        Vector3 startPos = transform.position;
+        Vector3 targetPos = startPos + dir * stepDistance;
 
         float t = 0f;
-        while (t < fallDuration)
+        while (t < 0.12f)
         {
             t += Time.deltaTime;
-            float a = Mathf.Clamp01(t / fallDuration);
-            transform.position = Vector3.Lerp(start, target, a);
+            transform.position = Vector3.Lerp(startPos, targetPos, t / 0.12f);
             yield return null;
         }
 
-        transform.position = target;
-        isFalling = false;
+        transform.position = targetPos;
+        isBusy = false;
     }
 
-    public IEnumerator TryPush(Vector2 dir)
+    IEnumerator FallContinuously()
     {
-        if (isMoving || isFalling) yield break;
-
-        Vector3 dir3 = new Vector3(dir.x, dir.y, 0f);
-
-        // ✅ Tính offset raycast dựa trên collider thực tế
-        float halfExtent = GetColliderHalfExtent(dir3);
-
-        // Điểm xuất phát raycast: lệch ra ngoài collider 1 chút theo hướng đẩy
-        Vector3 origin = transform.position + dir3*1.01f * halfExtent;
-        float distance = stepDistance - halfExtent;
-
-        RaycastHit2D hit = Physics2D.Raycast(origin, dir3, distance, blockMask);
-
-        Debug.DrawRay(origin, dir3 * distance, Color.yellow, 0.1f);
-
-        if (hit.collider != null)
+        isBusy = true;
+        while (ShouldFall())
         {
-            Debug.Log("Rock bị chặn bởi: " + hit.collider.name);
-            yield break;
-        }
+            Vector3 startPos = transform.position;
+            Vector3 targetPos = startPos + Vector3.down * stepDistance;
 
-        isMoving = true;
+            float t = 0f;
+            while (t < fallDuration)
+            {
+                t += Time.deltaTime;
+                float a = Mathf.Clamp01(t / fallDuration);
+                transform.position = Vector3.Lerp(startPos, targetPos, a);
+                yield return null;
+            }
 
-        Vector3 start = transform.position;
-        Vector3 target = start + dir3 * stepDistance;
-
-        float t = 0f;
-        while (t < fallDuration)
-        {
-            t += Time.deltaTime;
-            float a = Mathf.Clamp01(t / fallDuration);
-            transform.position = Vector3.Lerp(start, target, a);
+            transform.position = targetPos;
             yield return null;
         }
-
-        transform.position = target;
-        isMoving = false;
-
-// ✅ Đợi 1 frame trước khi gravity kiểm tra lại
-        if (dir == Vector2.up)
-        {
-            ScheduleFallAfter(0.08f + 0.01f); // rắn rơi trước
-        }
-    }
-    float GetColliderHalfExtent(Vector3 direction)
-    {
-        Collider2D col = GetComponent<Collider2D>();
-        if (col is BoxCollider2D box)
-        {
-            Vector2 size = box.size;
-            Vector2 scale = transform.lossyScale;
-            Vector2 worldSize = new Vector2(size.x * scale.x, size.y * scale.y);
-
-            direction = direction.normalized;
-
-            // xác định hướng nào có extent
-            float extent = 0.5f;
-            if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
-            {
-                extent = worldSize.x / 2f;
-            }
-            else
-            {
-                extent = worldSize.y / 2f;
-            }
-
-            return extent + 0.01f; // cộng nhỏ tránh ray trúng chính collider
-        }
-
-        return 0.5f;
+        isBusy = false;
     }
 
-    public void ScheduleFallAfter(float delaySeconds)
+    bool ShouldFall()
     {
-        StartCoroutine(DelayAndFall(delaySeconds));
+        Vector2 rayOrigin = GetBottomPoint();
+        rayOrigin += Vector2.down * 0.01f; // 👈 Dịch ra ngoài collider
+
+        float rayLength = stepDistance * 0.9f;
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, rayLength, supportMask);
+
+        Debug.DrawRay(rayOrigin, Vector2.down * rayLength, hit ? Color.green : Color.red, 0.5f);
+
+        return !hit;
     }
 
-    IEnumerator DelayAndFall(float delay)
+    bool IsPositionBlocked(Vector3 position)
     {
-        yield return new WaitForSeconds(delay);
-
-        while (!isMoving && !isFalling && ShouldFallOneUnit())
+        // Dùng OverlapCircle tại vị trí đích
+        Collider2D[] hits = Physics2D.OverlapCircleAll(position, 0.45f, supportMask);
+        foreach (var hit in hits)
         {
-            yield return StartCoroutine(FallOneUnit());
+            if (hit != null && hit.transform != transform)
+                return true;
         }
+        return false;
+    }
+
+    Vector2 GetBottomPoint()
+    {
+        BoxCollider2D box = GetComponent<BoxCollider2D>();
+        if (box != null)
+        {
+            Vector2 localBottom = new Vector2(box.offset.x, box.offset.y - box.size.y * 0.5f);
+            return transform.TransformPoint(localBottom);
+        }
+
+        CircleCollider2D circle = GetComponent<CircleCollider2D>();
+        if (circle != null)
+        {
+            Vector2 localBottom = circle.offset - Vector2.up * circle.radius;
+            return transform.TransformPoint(localBottom);
+        }
+
+        // Fallback: giả sử rock cao 1 unit
+        return (Vector2)transform.position - Vector2.up * 0.5f;
     }
 }

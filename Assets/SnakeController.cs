@@ -66,6 +66,9 @@ public class SnakeController : MonoBehaviour
         }
 
         CheckAppleAroundHead();
+
+        // 👇 Gọi gravity cho tất cả rock mỗi frame
+        ApplyGravityToAllRocks();
     }
 
     void HandleInput()
@@ -107,7 +110,14 @@ public class SnakeController : MonoBehaviour
 
         visuals.UpdateSegmentRotations();
     }
-
+    void ApplyGravityToAllRocks()
+    {
+        PushableRock[] rocks = FindObjectsOfType<PushableRock>();
+        foreach (var rock in rocks)
+        {
+            rock.TryApplyGravity();
+        }
+    }
     // ============== CHECK APPLE XUNG QUANH HEAD =========
     void CheckAppleAroundHead()
     {
