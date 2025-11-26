@@ -31,7 +31,7 @@ public class CameraController : MonoBehaviour
     private void Update()
     {
 #if UNITY_EDITOR
-        if (!Application.isPlaying && autoUpdateInEditor)
+        if (/*!Application.isPlaying &&*/ autoUpdateInEditor)
         {
             UpdateCameraView();
         }

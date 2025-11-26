@@ -38,7 +38,7 @@ public class SnakeCollision : MonoBehaviour
     // Spike không phải là điểm tựa
     public bool ShouldFallOneUnit()
     {
-        LayerMask supportMask = controller.groundMask | controller.wallMask | controller.finishMask | controller.appleMask;
+        LayerMask supportMask = controller.groundMask | controller.wallMask  | controller.appleMask;
 
         for (int i = 0; i < controller.segments.Count; i++)
         {
