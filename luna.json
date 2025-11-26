@@ -2,7 +2,7 @@
     "version": "6.4.0",
     "projectId": "8f5d959877bf4014b979a7e0e370f4e5",
     "applicationID": 34675,
-    "creativeName": "WPSAG_NgocBTU_ToiNV_V01",
+    "creativeName": "WPSAG_NgocBTU_ToiNV_V02",
     "pgServer": "EU",
     "window": {
         "‐′": true
@@ -2329,10 +2329,6 @@
             },
             {
                 "name": "UnityEngine.Joint",
-                "excluded": true
-            },
-            {
-                "name": "UnityEngine.ParticleSystem",
                 "excluded": true
             },
             {
@@ -17423,7 +17419,7 @@
                     },
                     {
                         "name": "TransformPoint$1",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "TransformPoint",
@@ -23361,7 +23357,7 @@
                     },
                     {
                         "name": "offset#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "offset#set",
@@ -23473,7 +23469,7 @@
                 "instanceMethods": [
                     {
                         "name": "size#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "size#set",
@@ -24857,7 +24853,7 @@
                     },
                     {
                         "name": "OverlapCircleAll",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "OverlapCircleNonAlloc",
@@ -32556,6 +32552,10 @@
                     {
                         "name": "CheckAppleAroundHead",
                         "excluded": false
+                    },
+                    {
+                        "name": "ApplyGravityToAllRocks",
+                        "excluded": false
                     }
                 ]
             },
@@ -33320,36 +33320,32 @@
                         "excluded": false
                     },
                     {
-                        "name": "Update",
-                        "excluded": true
-                    },
-                    {
-                        "name": "ShouldFallOneUnit",
-                        "excluded": true
-                    },
-                    {
-                        "name": "FallOneUnit",
-                        "excluded": true
-                    },
-                    {
                         "name": "TryPush",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
-                        "name": "GetColliderHalfExtent",
-                        "excluded": true
+                        "name": "TryApplyGravity",
+                        "excluded": false
                     },
                     {
-                        "name": "Awake",
-                        "excluded": true
+                        "name": "PushRoutine",
+                        "excluded": false
                     },
                     {
-                        "name": "ScheduleFallAfter",
-                        "excluded": true
+                        "name": "FallContinuously",
+                        "excluded": false
                     },
                     {
-                        "name": "DelayAndFall",
-                        "excluded": true
+                        "name": "ShouldFall",
+                        "excluded": false
+                    },
+                    {
+                        "name": "IsPositionBlocked",
+                        "excluded": false
+                    },
+                    {
+                        "name": "GetBottomPoint",
+                        "excluded": false
                     }
                 ]
             },
@@ -33561,6 +33557,272 @@
                     },
                     {
                         "name": "OnDrawGizmosSelected",
+                        "excluded": true
+                    }
+                ]
+            },
+            {
+                "className": "UnityEngine.ParticleSystem",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "main#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "emission#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "colorBySpeed#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "colorOverLifetime#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "rotationBySpeed#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "rotationOverLifetime#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "shape#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "sizeBySpeed#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "sizeOverLifetime#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "textureSheetAnimation#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "velocityOverLifetime#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "noise#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "inheritVelocity#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "forceOverLifetime#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "limitVelocityOverLifetime#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "enableEmission#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "enableEmission#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "maxParticles#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "maxParticles#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "isPlaying#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "isPaused#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "isStopped#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "time#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "isEmitting#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "particleCount#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "duration#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "duration#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "loop#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "loop#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "startDelay#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "startDelay#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "prewarm#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "prewarm#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "simulationSpace#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "simulationSpace#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "simulationSpeed#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "simulationSpeed#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "useRigidbodyForVelocity#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "useRigidbodyForVelocity#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "useUnscaledTime#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "useUnscaledTime#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "scalingMode#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "scalingMode#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "moveWithCustomTransform#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "moveWithCustomTransform#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "startSize3D#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "startSize3D#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "playOnAwake#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "playOnAwake#set",
+                        "excluded": true
+                    },
+                    {
+                        "name": "init",
+                        "excluded": true
+                    },
+                    {
+                        "name": "ctor",
+                        "excluded": true
+                    },
+                    {
+                        "name": "GetParticles",
+                        "excluded": true
+                    },
+                    {
+                        "name": "SetParticles",
+                        "excluded": true
+                    },
+                    {
+                        "name": "SetCustomParticleData",
+                        "excluded": true
+                    },
+                    {
+                        "name": "IsAlive",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Play",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Play$1",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Pause",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Pause$1",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Stop",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Stop$1",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Stop$2",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Emit",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Clear",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Simulate",
                         "excluded": true
                     }
                 ]

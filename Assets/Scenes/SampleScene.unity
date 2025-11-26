@@ -645,7 +645,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: -3027470590895668330, guid: 825634bd2c4dac64d9c081bc43be61dc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1611,7 +1611,6 @@ GameObject:
   - component: {fileID: 519420032}
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
-  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1693,25 +1692,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &519420033
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31005c33aa40af34b88665fdd85f5190, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetGroup: {fileID: 2715873481207741228}
-  anchorMinX: 0.05
-  anchorMinY: 0.3
-  anchorMaxX: 1
-  anchorMaxY: 0.8
-  padding: 0.5
-  autoUpdateInEditor: 1
 --- !u!1001 &540386135
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4700,6 +4680,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Depth_V3_0
       objectReference: {fileID: 0}
+    - target: {fileID: 6541424996098298339, guid: 84850540294b1e44d8cf620cfbde2c63, type: 3}
+      propertyPath: m_SortingOrder
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 8319629311636531312, guid: 84850540294b1e44d8cf620cfbde2c63, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1
@@ -5165,6 +5149,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4748598989128749664, guid: 40ca86e016f04e44f8dfaf2e80a93fe5, type: 3}
+      propertyPath: m_SortingOrder
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 8119384623508897564, guid: 40ca86e016f04e44f8dfaf2e80a93fe5, type: 3}
       propertyPath: m_Name
       value: Depth_H3_0
@@ -5551,6 +5539,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Depth_H1_0
       objectReference: {fileID: 0}
+    - target: {fileID: 3052873436597157959, guid: 9293e693fdfaf1c4f9151fc2ed33e500, type: 3}
+      propertyPath: m_SortingOrder
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 6496102479726757935, guid: 9293e693fdfaf1c4f9151fc2ed33e500, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -5899,7 +5891,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: -3027470590895668330, guid: 825634bd2c4dac64d9c081bc43be61dc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -7766,7 +7758,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: -8493597072646803810, guid: c03596dbe646fa147835a23f476f2d99, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
