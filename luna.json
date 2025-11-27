@@ -1,7 +1,7 @@
 {
     "version": "6.4.0",
     "projectId": "8f5d959877bf4014b979a7e0e370f4e5",
-    "applicationID": 34675,
+    "applicationID": 29138,
     "creativeName": "WPSAG_NgocBTU_ToiNV_V02",
     "pgServer": "EU",
     "window": {
@@ -5317,7 +5317,7 @@
             },
             {
                 "name": "UnityEngine.SpriteTileMode",
-                "excluded": true
+                "excluded": false
             },
             {
                 "name": "UnityEngine.StackTraceLogType",
@@ -15853,7 +15853,7 @@
                     },
                     {
                         "name": "position#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "position#set",
@@ -18829,7 +18829,7 @@
                     },
                     {
                         "name": "size#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "size#set",
@@ -18837,7 +18837,7 @@
                     },
                     {
                         "name": "tileMode#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "tileMode#set",
@@ -18845,7 +18845,7 @@
                     },
                     {
                         "name": "adaptiveModeThreshold#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "adaptiveModeThreshold#set",
@@ -23311,7 +23311,7 @@
                     },
                     {
                         "name": "Get9TiledMesh",
-                        "excluded": true
+                        "excluded": false
                     }
                 ]
             },
@@ -32121,7 +32121,7 @@
                     },
                     {
                         "name": "Stop",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "Tick",
@@ -32502,6 +32502,10 @@
                     {
                         "name": "OnClickEndCard",
                         "excluded": false
+                    },
+                    {
+                        "name": "CancleInvokeEndCard",
+                        "excluded": true
                     }
                 ]
             },
@@ -33400,6 +33404,10 @@
                     {
                         "name": "StopMusic",
                         "excluded": false
+                    },
+                    {
+                        "name": "Start",
+                        "excluded": false
                     }
                 ]
             },
@@ -33824,6 +33832,32 @@
                     {
                         "name": "Simulate",
                         "excluded": true
+                    }
+                ]
+            },
+            {
+                "className": "CameraController",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "init",
+                        "excluded": false
+                    },
+                    {
+                        "name": "Start",
+                        "excluded": false
+                    },
+                    {
+                        "name": "Update",
+                        "excluded": false
+                    },
+                    {
+                        "name": "UpdateCameraView",
+                        "excluded": false
+                    },
+                    {
+                        "name": "AdjustCamera",
+                        "excluded": false
                     }
                 ]
             }

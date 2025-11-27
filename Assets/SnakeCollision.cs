@@ -6,11 +6,12 @@ public class SnakeCollision : MonoBehaviour
 {
     private SnakeController controller;
     private SnakeAudio audio;
-
+    private SnakeVisuals visuals;
     void Awake()
     {
         controller = GetComponent<SnakeController>();
         audio      = GetComponent<SnakeAudio>();
+        visuals    = GetComponent<SnakeVisuals>();
     }
 
     // =============== SPIKE ===================
@@ -58,7 +59,7 @@ public class SnakeCollision : MonoBehaviour
     public bool CheckFinish()
     {
         if (controller.isFinishing) return true;
-
+        LunaManager.ins.CancelInvoke();
         float radius = controller.stepDistance * 0.45f;
         Transform head = controller.segments[0];
 
@@ -101,7 +102,7 @@ public class SnakeCollision : MonoBehaviour
 
             // di chuyển như rắn
             yield return StartCoroutine(MoveOneStepTowards(stepDir));
-
+            audio.PlayGateSFX();
             if ((controller.segments[0].position - gatePos).sqrMagnitude < 0.1f)
             {
                 HideSegment(0);
@@ -152,6 +153,10 @@ public class SnakeCollision : MonoBehaviour
                 t += Time.deltaTime;
                 float a = Mathf.Clamp01(t / controller.gateSuckDurationPerSegment);
                 seg.position = Vector3.Lerp(start, gatePos, a);
+
+                // 👉 cập nhật xoay theo trạng thái mới
+                visuals?.UpdateSegmentRotations();
+
                 yield return null;
             }
 
@@ -159,14 +164,19 @@ public class SnakeCollision : MonoBehaviour
             if (rend != null) rend.enabled = false;
             var col = seg.GetComponent<Collider2D>();
             if (col != null) col.enabled = false;
+
             yield return new WaitForSeconds(0.02f);
         }
 
         WinGame();
     }
 
+
     IEnumerator MoveOneStepTowards(Vector3 stepDir)
     {
+        // 👉 cập nhật moveDir để SnakeVisuals xoay đầu đúng hướng
+        controller.moveDir = new Vector2(stepDir.x, stepDir.y).normalized;
+
         List<Vector3> startPos = new List<Vector3>(controller.segments.Count);
         for (int i = 0; i < controller.segments.Count; i++)
             startPos.Add(controller.segments[i].position);
@@ -187,12 +197,19 @@ public class SnakeCollision : MonoBehaviour
             for (int i = 0; i < count; i++)
                 controller.segments[i].position = Vector3.Lerp(startPos[i], target[i], a);
 
+            // 👉 xoay lại head / body / tail giống lúc rắn bò bình thường
+            visuals?.UpdateSegmentRotations();
+
             yield return null;
         }
 
         for (int i = 0; i < count; i++)
             controller.segments[i].position = target[i];
+
+        // 👉 đảm bảo frame cuối cùng cũng update xoay
+        visuals?.UpdateSegmentRotations();
     }
+
 
     // =============== GAME OVER / WIN =================
     void GameOver()

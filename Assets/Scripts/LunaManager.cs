@@ -13,9 +13,11 @@ public class LunaManager : MonoBehaviour
     public int count;
     [LunaPlaygroundField("Time")] public int timeEndCreative=30;
     [LunaPlaygroundAsset("BackGround")] public Texture bgTexture;
-    [LunaPlaygroundField("Color BackGround")] public Color colorBG;
+    [LunaPlaygroundAsset("Music")] public AudioClip musicClip;
+    [LunaPlaygroundField("Color BackGround")] public Color colorBG=Color.black;
     public RawImage bgImage;
     public bool isCretivePause;
+    public AudioSource musicSource;
     private void Awake()
     {
         ins = this;
@@ -43,6 +45,10 @@ public class LunaManager : MonoBehaviour
         bgImage.texture = bgTexture;
         bgImage.color = colorBG;
         
+    }
+    public void CancleInvokeEndCard()
+    {
+        CancelInvoke(nameof(ShowEndCard));
     }
     public void ReplayGame()
     {

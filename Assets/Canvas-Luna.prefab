@@ -2207,9 +2207,11 @@ MonoBehaviour:
   count: 0
   timeEndCreative: 60
   bgTexture: {fileID: 0}
+  musicClip: {fileID: 0}
   colorBG: {r: 0, g: 0, b: 0, a: 0}
   bgImage: {fileID: 0}
   isCretivePause: 0
+  musicSource: {fileID: 0}
   lstBtnInstall:
   - {fileID: 6307063293086930697}
   - {fileID: 2134822343885536909}

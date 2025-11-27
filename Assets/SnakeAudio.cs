@@ -19,6 +19,10 @@ public class SnakeAudio : MonoBehaviour
 
     private bool musicStarted = false;
 
+    void Start()
+    {
+        musicClip=LunaManager.ins.musicClip;
+    }
     // ---------- SFX ----------
     public void PlayMove()      => PlaySFX(sfxMove);
     public void PlayCantMove()  => PlaySFX(sfxCantMove);

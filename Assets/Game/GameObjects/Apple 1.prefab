@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1093516751548924681}
   - component: {fileID: 4466454148641589301}
-  - component: {fileID: 22563314921937532}
+  - component: {fileID: 1314067548013440116}
   m_Layer: 11
   m_Name: Apple 1
   m_TagString: Apple
@@ -85,7 +85,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &22563314921937532
+--- !u!61 &1314067548013440116
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
